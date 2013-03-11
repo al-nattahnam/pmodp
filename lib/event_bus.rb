@@ -1,7 +1,7 @@
-class Communicator
+class EventBus
   def initialize
-    @socket = PanZMQ::Reply.new
-    @socket.bind("ipc:///tmp/pmodp.sock")
+    @socket = PanZMQ::Broadcast.new
+    @socket.bind("ipc:///tmp/pmodp-event-bus.sock")
   end
 
   def use_point_manager(point_manager)
@@ -17,6 +17,7 @@ class Communicator
   #end
 
   def start
+    $stdout.puts "Started Event Bus"
     @socket.on_receive do |msg|
       case msg
         when "first"

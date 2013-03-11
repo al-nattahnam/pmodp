@@ -1,15 +1,13 @@
-require '/home/krakatoa/workspace/al-nattahnam/pan-zmq/lib/pan-zmq.rb'
-# require 'pan-zmq'
-require './connector'
+require_relative './client/module_client.rb'
 
 class Application
-  def initialize(mod)
+  def initialize(mod, events, needs_message, observer_only)
     @module = mod
+    @client = ModuleClient.new(mod, events, needs_message, observer_only)
   end
 
   def setup
-    get_info
-    set_pipelining
+    register
   end
 
   def process(msg)
@@ -24,46 +22,24 @@ class Application
   end
 
   def run
-    start_pipelining
+    login
   end
 
   private
-  def get_info
-    conn = Connector.new
-    @info = conn.ask(@module)
+  def register
+    @client.register
   end
 
-  def set_pipelining
-    $stdout.puts "setting pipelining with this info: #{@info}"
-    # It should retry until connections are done on all point_bs
-
-    @in = PanZMQ::Reply.new
-    @in.bind(@info[:path])
-    @in.register
-
-    if @info[:output_path]
-      @out = PanZMQ::Request.new
-      @out.connect(@info[:output_path])
-    end
-    
-    @in.on_receive do |msg|
-      @in.send_string('received')
-      output = process msg
-      if @info[:output_path]
-        @out.send_string(output)
-        @out.recv_string
-      else
-        $stdout.puts "ended: #{msg} at #{Time.now}"
-      end
-    end
+  def login
+    @client.login
   end
 
-  def start_pipelining
-    # Use fibers so we dont poll under activity
-    #Thread.new do
-      while true
-        PanZMQ::Poller.instance.poll
-      end
-    #end
-  end
+  #def start_pipelining
+  #  # Use fibers so we dont poll under activity
+  #  #Thread.new do
+  #    while true
+  #      PanZMQ::Poller.instance.poll
+  #    end
+  #  #end
+  #end
 end
