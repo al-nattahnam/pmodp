@@ -1,9 +1,10 @@
-require_relative './client/module_client.rb'
+require_relative './client/client.rb'
 
 class Application
   def initialize(mod, events, needs_message, observer_only)
     @module = mod
-    @client = ModuleClient.new(mod, events, needs_message, observer_only)
+    @client = Client.new # (mod, events, needs_message, observer_only)
+    @client.set_module_attrs(mod, events, needs_message, observer_only)
   end
 
   def setup
@@ -23,6 +24,10 @@ class Application
 
   def run
     login
+    @client.bind("event") do |msg|
+      puts "Llego: #{msg}"
+    end
+    @client.consume
   end
 
   private
@@ -34,12 +39,9 @@ class Application
     @client.login
   end
 
-  #def start_pipelining
-  #  # Use fibers so we dont poll under activity
-  #  #Thread.new do
-  #    while true
-  #      PanZMQ::Poller.instance.poll
-  #    end
-  #  #end
-  #end
 end
+
+@n = rand(50)
+app = Application.new("Mod-#{@n}", ["received"], true, false)
+app.setup
+app.run

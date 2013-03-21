@@ -1,6 +1,6 @@
 require 'pan-zmq'
 require_relative './receiver'
-require_relative './event_bus'
+#require_relative './event_bus'
 require_relative './point'
 require_relative './point_manager'
 
@@ -13,8 +13,8 @@ class Pmodp
     
     @receiver = Receiver.new
     
-    @event_bus = EventBus.new
-    @event_bus.use_point_manager(@point_manager)
+    #@event_bus = EventBus.new
+    #@event_bus.use_point_manager(@point_manager)
   end
 
   def points
@@ -23,7 +23,7 @@ class Pmodp
 
   def run
     @receiver.start
-    #@communicator.start
+  #  #@communicator.start
     while true
       PanZMQ::Poller.instance.poll
     end
