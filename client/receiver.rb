@@ -21,7 +21,10 @@ class Receiver
   def set_callbacks
     @socket.on_receive do |msg|
       #puts "Receiver#set_callbacks: #{msg}"
-      msg_type, msg_destination = msg.split("\n")[0].split(" ")
+      header = msg.split("\n")[0]
+      body = msg.split("\n")[1..-1]
+
+      msg_type, msg_destination = header.split(" ")
       #puts "Receiver#set_callbacks msg_type: #{msg_type}"
       #puts "Receiver#set_callbacks msg_destination: #{msg_destination}"
 
@@ -29,12 +32,17 @@ class Receiver
         when "LOGIN"
           @login_callbacks[msg_destination].call(msg)
         when "EVENT"
-          @event_callbacks[msg_destination].call(msg)
+          @event_callbacks[msg_destination].call(parse_body(body))
       end
     end
   end
 
   def close
     @socket.close
+  end
+
+  private
+  def parse_body(body)
+    body.inject({}) {|h, l| n,v = l.split(": "); h[n] = v; h}
   end
 end
