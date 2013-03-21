@@ -1,6 +1,6 @@
 require './client/message_generator'
 
-puts MessageGenerator.registration("console", ["received", "finished"], true, false)
+# puts MessageGenerator.registration("console", ["received", "finished"], true, false)
 
 puts "\n"
 

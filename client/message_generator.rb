@@ -5,19 +5,19 @@ class MessageGenerator
       "PMODP/0.1"
     end
 
-    def registration(mod, events, needs_message=true, observer_only=false)
-      msg = <<eos
-REGISTER #{version}
-Module: #{mod}
-Events: #{events.join(",")}
-Needs-Message: #{needs_message}
-Observer-Only: #{observer_only}
-eos
-    end
+#    def registration(mod, events, needs_message=true, observer_only=false)
+#      msg = <<eos
+#REGISTER #{version}
+#Module: #{mod}
+#Events: #{events.join(",")}
+#Needs-Message: #{needs_message}
+#Observer-Only: #{observer_only}
+#eos
+#    end
 
     def login(mod)
       msg = <<eos
-LOGIN #{version}
+LOGIN #{mod} #{version}
 Module: #{mod}
 eos
     end
@@ -49,12 +49,12 @@ Id: #{id}
 eos
     end
     
-    def event(mod, id, event, additionals={})
+    def event(mod, event, additionals={})
       msg = <<eos
 EVENT #{mod}:#{event} #{version}
 Module: #{mod}
-Id: #{id}
 eos
+      # TODO add Id: UUID ?
       additionals.each do |k,v|
         msg << "#{k}: #{v}\n"
       end

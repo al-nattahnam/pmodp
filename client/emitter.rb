@@ -11,4 +11,12 @@ class Emitter
   def login(mod)
     @socket.send_string MessageGenerator.login(mod)
   end
+
+  def event(mod, event, additionals)
+    @socket.send_string MessageGenerator.event(mod, event, additionals)
+  end
+
+  def close
+    @socket.close
+  end
 end

@@ -8,7 +8,15 @@ class Application
   end
 
   def setup
-    register
+    #register
+  end
+
+  def shout
+    @client.trigger_event("done", {"Id" => 1, "Task" => "build"})
+  end
+
+  def respond(event)
+    @client.trigger_event("ok")
   end
 
   def process(msg)
@@ -22,14 +30,21 @@ class Application
     return new_msg
   end
 
+  def register_event(event)
+    @client.bind(event) do |msg|
+      puts "Llego: #{msg}"
+      @client.trigger_event("ok")
+    end
+  end
+
   def run
     login
-    @client.bind("event") do |msg|
-      puts "Llego: #{msg}"
-    end
     @client.consume
   end
 
+  def shutdown
+    @client.close
+  end
   private
   def register
     @client.register
@@ -39,9 +54,29 @@ class Application
     @client.login
   end
 
+
 end
 
-@n = rand(50)
-app = Application.new("Mod-#{@n}", ["received"], true, false)
-app.setup
-app.run
+fork do
+  app = Application.new("Mod-A", ["received"], true, false)
+  trap("INT") { app.shutdown; PanZMQ.terminate }
+  app.setup
+  app.register_event("Mod-B:ok")
+  Thread.new do
+    while true
+      sleep 1
+      app.shout
+    end
+  end
+  app.run
+end
+
+fork do
+  app = Application.new("Mod-B", ["received"], true, false)
+trap("INT") { app.shutdown; PanZMQ.terminate }
+  app.setup
+  app.register_event("Mod-A:done")
+  app.run
+end
+
+Process.waitall

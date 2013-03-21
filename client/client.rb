@@ -28,21 +28,31 @@ class Client
     @emitter.login(@module)
   end
 
+  def trigger_event(event, additionals={})
+    @emitter.event(@module, event, additionals)
+  end
+
+  def bind_login(mod, &block)
+    @receiver.on_login(mod, block)
+  end
+
   def bind(event, &block)
-    #@receiver.listen
-    #@receiver.on_receive do |msg|
-    #  block.call(msg)
-    #end
-    @receiver.bind(event, block)
+    @receiver.on_event(event, block)
   end
 
   def consume
   #  # Use fibers so we dont poll under activity
     #Thread.new do
+      @receiver.set_callbacks
       while true
         PanZMQ::Poller.instance.poll
       end
     #end
+  end
+
+  def close
+    @receiver.close
+    @emitter.close
   end
 
 end
