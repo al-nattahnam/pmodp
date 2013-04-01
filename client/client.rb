@@ -6,11 +6,17 @@ require_relative './message_generator.rb'
 require_relative './emitter.rb'
 require_relative './receiver.rb'
 
+require_relative '../dci/parser.rb'
+
 # TODO rename to Client
 class Client
   def initialize
     @emitter = Emitter.new
-    @receiver = Receiver.new
+    @receiver = Receiver.new(:client => self)
+
+    parser = Parser.new("./dci/context.txt")
+    @config  = parser.parse
+
   end
 
   def set_module_attrs(mod, events, needs_message, observer_only)
@@ -32,12 +38,24 @@ class Client
     @emitter.event(@module, event, additionals)
   end
 
+  def trigger_process(mod, process_name, additionals={})
+    @emitter.process(mod, process_name, additionals)
+  end
+
   def bind_login(mod, &block)
     @receiver.on_login(mod, block)
   end
 
   def bind(event, &block)
     @receiver.on_event(event, block)
+  end
+
+  def bind_process(process_name, &block)
+    @receiver.on_process(@module, process_name, block)
+  end
+
+  def catch_result(mod, process_name, &block)
+    @receiver.on_event("#{mod}:#{process_name}.finished", block)
   end
 
   def consume

@@ -22,13 +22,16 @@ Module: #{mod}
 eos
     end
 
-    def process(id, content)
+    def process(mod, process_name, additionals)
       # This is the incoming message, given by the Application
       msg = <<eos
-PROCESS #{version}
-Id: #{id}
-Content: #{content}
+PROCESS #{mod}##{process_name} #{version}
 eos
+      additionals.each do |k,v|
+        msg << "#{k}: #{v}\n"
+      end
+
+      msg
     end
     
     def delegation(mod, id, content=nil)
@@ -60,6 +63,28 @@ eos
       end
 
       msg
+    end
+    
+    def new_event(role_name, message, context=nil, additionals={})
+      destination = ""
+      destination << "#{role_name}##{message}"
+      destination << "@#{context}" if context
+      msg = <<eos
+MSG #{destination} #{version}
+eos
+      # TODO add Id: UUID ?
+      additionals.each do |k,v|
+        msg << "#{k}: #{v}\n"
+      end
+
+      msg
+    end
+
+    def new_listen_up(application_name, context_name)
+      msg = <<eos
+NEW_CONTEXT #{application_name}#new_context #{version}
+eos
+
     end
   end
 end

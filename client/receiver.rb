@@ -1,11 +1,14 @@
 class Receiver
-  def initialize
+  def initialize(opts={})
     @socket = PanZMQ::Subscribe.new
     @socket.connect "ipc:///tmp/cucub-a-in.sock"
     @socket.register
 
+    @client = opts[:client]
+
     @login_callbacks = {}
     @event_callbacks = {}
+    @process_callbacks = {}
   end
 
   def on_login(mod, block=nil)
@@ -16,6 +19,16 @@ class Receiver
   def on_event(event, block=nil)
     @event_callbacks[event] = block
     @socket.listen("EVENT #{event}")
+  end
+
+  def on_process(mod, proc_name, block=nil)
+    callback_name = "#{mod}##{proc_name}"
+    
+    @process_callbacks[callback_name] = Proc.new { |msg|
+      @client.trigger_event("#{proc_name}.started")
+      @client.trigger_event("#{proc_name}.finished", {:result => block.call(msg)})
+    }
+    @socket.listen("PROCESS #{mod}##{proc_name}")
   end
 
   def set_callbacks
@@ -31,6 +44,8 @@ class Receiver
       case msg_type
         when "LOGIN"
           @login_callbacks[msg_destination].call(msg)
+        when "PROCESS"
+          @process_callbacks[msg_destination].call(parse_body(body))
         when "EVENT"
           @event_callbacks[msg_destination].call(parse_body(body))
       end

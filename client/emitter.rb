@@ -16,6 +16,12 @@ class Emitter
     @socket.send_string MessageGenerator.event(mod, event, additionals)
   end
 
+  def process(mod, process_name, additionals)
+    message = MessageGenerator.process(mod, process_name, additionals)
+    $stdout.puts "will emit: #{message}"
+    @socket.send_string message
+  end
+
   def close
     @socket.close
   end
