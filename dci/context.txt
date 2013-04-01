@@ -1,0 +1,25 @@
+#from OI
+#  ~loadable
+#  ~routable
+
+~loadable from OI
+~deserializable from Serializer
+~routable from OI
+
+<:message> or (:msg)
+  - attrs(:content)
+  - is(:loadable)
+  - is(:deserializable)
+  - is(:routable)
+
+(:msg) : load, deserialize, enroute
+
+#(:msg) : log, deserialize
+#(:msg).deserialize -> (:logger).log
+
+#(:msg).load -> (:msg).deserialize -> (:msg).enroute
+#wait(:msg)
+#wait(:all)
+
+# use(:loadable).from("OI")
+# use(:deserializable).from("Serializer")

@@ -22,6 +22,13 @@ class Emitter
     @socket.send_string message
   end
 
+  def context_definition(mod, definition)
+    message = MessageGenerator.context_definition(mod, definition)
+    $stdout.puts "will define context: #{message}"
+
+    @socket.send_string message
+  end
+
   def close
     @socket.close
   end

@@ -22,7 +22,8 @@ class Interface
   end
 
   def run
-    login
+    bind_context_definition
+    #login
     @client.bind_process("process") do |msg|
       $stdout.puts "@#{@module} llego #{msg}"
       BusinessLogic.process(@module, msg)
@@ -35,8 +36,11 @@ class Interface
     @client.close
   end
   private
-  def login
-    @client.login
+  #def login
+  #  @client.login
+  #end
+  def bind_context_definition
+    @client.bind_context_definition
   end
 
 end

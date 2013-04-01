@@ -31,6 +31,10 @@ class Receiver
     @socket.listen("PROCESS #{mod}##{proc_name}")
   end
 
+  def on_context_definition(mod)
+    @socket.listen("CONTEXT_DEFINITION #{mod}")
+  end
+
   def set_callbacks
     @socket.on_receive do |msg|
       #puts "Receiver#set_callbacks: #{msg}"
@@ -44,12 +48,18 @@ class Receiver
       case msg_type
         when "LOGIN"
           @login_callbacks[msg_destination].call(msg)
+        when "CONTEXT_DEFINITION"
+          read_context_definition(msg)
         when "PROCESS"
           @process_callbacks[msg_destination].call(parse_body(body))
         when "EVENT"
           @event_callbacks[msg_destination].call(parse_body(body))
       end
     end
+  end
+
+  def read_context_definition(definition)
+    $stdout.puts "should set: #{definition}"
   end
 
   def close

@@ -1,0 +1,41 @@
+0. Previo, deben estar definidos los roles (interfaz) por cada uno de los Modulos.
+  ejemplo:
+  
+  Modulo Serializer:
+    def #deserializable(in) # (in has the data object list associated to the current context, extra params are to be another data object)
+      r = deserialize(in)
+      out(r)
+
+inside role definitions, context(:msg) refers to the object, and it may be asked for its attributes or by calling one of its associated methods in the current context
+def #deserializable(in)
+  (under the hood, it process <in> and generates the current context)
+  r = deserialize(context(:msg).content)
+  out(r) => fires #deserializable.ended event
+  
+
+0. Context begins
+1. DataObject init
+2. Stream of messages begin. Every message is composed of a method name plus a DataObject, or part of it.
+
+<:message> or (:msg)
+  - attrs(:content)
+  - is(:loadable)
+  - is(:deserializable)
+  - is(:routable)
+
+from OI
+  ~loadable
+  ~routable
+~deserializable from Serializer
+
+(:msg) : load, deserialize, enroute
+# (:msg).deserialize -> (:logger).log
+#wait(:msg)
+#lowait(:all)
+
+def #load(in=nil)
+  broadcast(in)
+end
+
+#~loadable means
+#  OI.load(:content)

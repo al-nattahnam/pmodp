@@ -80,9 +80,10 @@ eos
       msg
     end
 
-    def new_listen_up(application_name, context_name)
+    def context_definition(application_name, definition)
       msg = <<eos
-NEW_CONTEXT #{application_name}#new_context #{version}
+CONTEXT_DEFINITION #{application_name}#new_context #{version}
+Definition: #{definition}
 eos
 
     end

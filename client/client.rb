@@ -13,10 +13,6 @@ class Client
   def initialize
     @emitter = Emitter.new
     @receiver = Receiver.new(:client => self)
-
-    parser = Parser.new("./dci/context.txt")
-    @config  = parser.parse
-
   end
 
   def set_module_attrs(mod, events, needs_message, observer_only)
@@ -26,13 +22,13 @@ class Client
     @observer_only = observer_only
   end
 
-  def register
-    @emitter.registration(@module, @events, @needs_message, @observer_only)
-  end
+  #def register
+  #  @emitter.registration(@module, @events, @needs_message, @observer_only)
+  #end
 
-  def login
-    @emitter.login(@module)
-  end
+  #def login
+  #  @emitter.login(@module)
+  #end
 
   def trigger_event(event, additionals={})
     @emitter.event(@module, event, additionals)
@@ -40,6 +36,10 @@ class Client
 
   def trigger_process(mod, process_name, additionals={})
     @emitter.process(mod, process_name, additionals)
+  end
+
+  def bind_context_definition
+    @receiver.on_context_definition(@module)
   end
 
   def bind_login(mod, &block)
@@ -58,10 +58,17 @@ class Client
     @receiver.on_event("#{mod}:#{process_name}.finished", block)
   end
 
+  def send_context(mod, definition_path)
+    definition = Parser.new(definition_path).parse
+    
+    @emitter.context_definition(mod, definition)
+  end
+
   def consume
   #  # Use fibers so we dont poll under activity
     #Thread.new do
       @receiver.set_callbacks
+      @emitter.login(@module)
       while true
         PanZMQ::Poller.instance.poll
       end

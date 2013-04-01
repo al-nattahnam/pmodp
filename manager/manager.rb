@@ -11,7 +11,7 @@ class Manager
     @modules = modules
 
     @client = Client.new
-    
+
     #@event_bus = EventBus.new
     #@event_bus.use_point_manager(@point_manager)
   end
@@ -24,6 +24,7 @@ class Manager
     @modules.each do |mod|
       @client.bind_login(mod) do |msg|
         puts "Se logueo: #{msg}"
+        @client.send_context(mod, File.join(File.expand_path(File.dirname(__FILE__)), "../dci/context.txt"))
       end
     end
     @client.consume

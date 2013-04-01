@@ -1,0 +1,10 @@
+~routable from OI
+~executable from Worker
+
+<:message>
+  - attrs(:task)
+  - attrs(:class_name)
+  - is(:routable)
+  - is(:executable)
+
+(:msg) : enroute, execute

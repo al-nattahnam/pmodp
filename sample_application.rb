@@ -29,7 +29,7 @@ class Interface
   end
 
   def run
-    login
+    #login
 
     @client.catch_result("Mod-B", "process") do |msg|
       $stdout.puts "@#{@module} termino #{msg}"
@@ -46,9 +46,9 @@ class Interface
     @client.close
   end
   private
-  def login
-    @client.login
-  end
+  #def login
+  #  @client.login
+  #end
 
 end
 
