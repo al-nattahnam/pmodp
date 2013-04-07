@@ -1,4 +1,4 @@
-require './client/message_generator'
+require '../lib/message_generator'
 
 puts MessageGenerator.new_event("serializer", "serialize", "Routing", {"Content" => "-- unserialized-message-- "})
 

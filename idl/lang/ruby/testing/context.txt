@@ -23,3 +23,13 @@
 
 # use(:loadable).from("OI")
 # use(:deserializable).from("Serializer")
+
+module OI
+  role loadable
+    has OI:content
+  end
+
+  role routable
+     
+  end
+end

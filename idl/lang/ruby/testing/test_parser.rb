@@ -1,4 +1,4 @@
-require './parser'
+require '../lib/schema/parser'
 
 parser = Parser.new("./context.txt")
 context = parser.parse
