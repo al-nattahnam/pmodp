@@ -22,7 +22,7 @@ Module: #{mod}
 eos
     end
 
-    def process(mod, process_name, additionals)
+    def process(mod, process_name, additionals={})
       # This is the incoming message, given by the Application
       msg = <<eos
 PROCESS #{mod}##{process_name} #{version}
